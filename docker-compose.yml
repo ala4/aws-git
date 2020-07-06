@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+
+  # AWS CLI 実行用
+  aws:
+    build:
+      context: .
+    image: ala4/aws-git
+    entrypoint: "/usr/local/bin/aws"
+    working_dir: "/work"
+    volumes:
+      - "./:/work"
+      - "~/.aws:/root/.aws"
+
+  # Git 実行用
+  git:
+    build:
+      context: .
+    image: ala4/aws-git
+    entrypoint: "/usr/bin/git"
+    working_dir: "/work"
+    volumes:
+      - "./:/work"
+      - "~/.aws:/root/.aws"
+      - "~/.gitconfig:/root/.gitconfig"
+
+  # シェル作業用
+  bash:
+    build:
+      context: .
+    image: ala4/aws-git
+    entrypoint: "/bin/bash"
+    tty: true
+    working_dir: "/work"
+    volumes:
+      - "./:/work"
+      - "~/.aws:/root/.aws"
+      - "~/.gitconfig:/root/.gitconfig"
