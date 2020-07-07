@@ -32,7 +32,7 @@ COPY --from=aws-installer /aws-cli-bin/ /usr/local/bin/
 #   ref: https://github.com/aws/aws-cli/issues/5038
 # ※ groffが無いと`aws help`実行時に`Could not find executable named "groff"`のエラーが出る
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        less groff \
+        less groff jq \
         git git-flow \
     && apt clean && rm -rf /var/lib/apt/lists/*
 
