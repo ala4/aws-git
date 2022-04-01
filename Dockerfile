@@ -10,7 +10,7 @@ RUN yum update -y \
 RUN /aws-cli-bin//aws --version
 
 #==== AWS,Git作業用コンテナ ====
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 #-- パッケージのインストールなど --
 
@@ -28,14 +28,14 @@ COPY --from=aws-installer /usr/local/aws-cli/ /usr/local/aws-cli/
 COPY --from=aws-installer /aws-cli-bin/ /usr/local/bin/
 
 # Python3, pip
-RUN apt-get update && apt-get install -y \
+RUN apt update && apt install -y \
         python3 \
-        python-pip python3-pip \
+        python3-pip \
         curl \
-    && apt clean && rm -rf /var/lib/apt/lists/* \
-    && curl -O https://bootstrap.pypa.io/get-pip.py \
-    && python3 get-pip.py --user \
-    && rm get-pip.py
+    && apt clean && rm -rf /var/lib/apt/lists/*
+RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
+    python3 get-pip.py --user && \
+    rm get-pip.py
 
 # git-remote-codecommit
 RUN pip install git-remote-codecommit
@@ -47,6 +47,10 @@ RUN pip install git-remote-codecommit
 RUN apt-get update && apt-get install -y --no-install-recommends \
         less groff jq \
         git git-flow \
+    && apt clean && rm -rf /var/lib/apt/lists/*
+# 利便性のため圧縮解凍ツールをインストール
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        zip unzip \
     && apt clean && rm -rf /var/lib/apt/lists/*
 
 #-- 実行用の設定 --
