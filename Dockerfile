@@ -23,6 +23,20 @@ RUN apt-get update && apt-get install -y \
 ENV TZ=Asia/Tokyo
 ENV LANG=ja_JP.UTF-8
 
+# コンテナ実行用の非rootユーザー
+ARG USERNAME=user
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USERNAME && \
+    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    apt update -y && \
+    apt-get install -y sudo && \
+    apt clean && rm -rf /var/lib/apt/lists/* && \
+    echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME && \
+    chmod 0440 /etc/sudoers.d/$USERNAME
+
 # AWS-CLIのインストール
 COPY --from=aws-installer /usr/local/aws-cli/ /usr/local/aws-cli/
 COPY --from=aws-installer /aws-cli-bin/ /usr/local/bin/
@@ -52,6 +66,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-get update && apt-get install -y --no-install-recommends \
         zip unzip \
     && apt clean && rm -rf /var/lib/apt/lists/*
+
+# コンテナ実行用のユーザーで実行する
+USER $USERNAME
 
 #-- 実行用の設定 --
 WORKDIR /work
